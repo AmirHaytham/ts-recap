@@ -1,0 +1,217 @@
+openapi: 3.0.3
+info:
+  title: Task Manager API
+  version: 1.0.0
+  description: The API from the Swagger slides, small enough to read in one sitting.
+servers:
+  - url: http://localhost:3000
+
+tags:
+  - name: Tasks
+    description: Create, read, update and delete tasks
+  - name: Auth
+    description: A fake login so there is a POST to try
+
+paths:
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: List tasks
+      description: Returns every task, or only done / not done ones if you pass `completed`.
+      operationId: getTasks
+      parameters:
+        - in: query
+          name: completed
+          required: false
+          schema:
+            type: boolean
+          description: Filter by completion status
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      tags:
+        - Tasks
+      summary: Create a task
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTask'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /tasks/{id}:
+    get:
+      tags:
+        - Tasks
+      summary: Get a task by ID
+      description: Retrieve detailed information for a specific task by its ID.
+      operationId: getTaskById
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      responses:
+        '200':
+          description: Task found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Tasks
+      summary: Update a task
+      operationId: updateTask
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                completed:
+                  type: boolean
+      responses:
+        '200':
+          description: Task updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Tasks
+      summary: Delete a task
+      operationId: deleteTask
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      responses:
+        '204':
+          description: Task deleted, nothing returned
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /login:
+    post:
+      tags:
+        - Auth
+      summary: Log in
+      description: Hardcoded on purpose. Use student@giu-uni.de and sp1.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: student@giu-uni.de
+              password: sp1
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  email:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Wrong email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '1'
+        title:
+          type: string
+          example: Write the OpenAPI spec
+        completed:
+          type: boolean
+          example: false
+    NewTask:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: Study TypeScript generics
+        completed:
+          type: boolean
+          example: false
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+
+  parameters:
+    TaskIdParam:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+      description: The ID of the task
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Something required is missing from the request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
