@@ -1,0 +1,14 @@
+{
+  "name": "lab2-05-ts-object-type",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "check": "tsc --noEmit",
+    "mistakes": "tsc --noEmit --strict --target es2022 --module commonjs src/mistakes.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}
