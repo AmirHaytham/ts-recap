@@ -11,6 +11,32 @@ a few things worth showing while it is on screen.
 
 Node 18 or newer. Nothing else. No database anywhere in this repo.
 
+## Running everything at once
+
+From the repo root:
+
+```bash
+node run-all.js
+```
+
+It goes through every folder in order and prints each output under a header.
+For each TypeScript folder that is the `npm start` output followed by the
+compiler errors from `mistakes.ts`. For the Swagger folder it starts the server,
+calls each endpoint, prints the status and body, then shuts the server down.
+Missing dependencies get installed on the first run.
+
+Skip the compiler errors, which also makes it a lot faster:
+
+```bash
+node run-all.js --no-mistakes
+```
+
+Only some folders:
+
+```bash
+node run-all.js 07 10
+```
+
 ## The folders
 
 | # | Folder | Slide | Run |
